@@ -1,8 +1,14 @@
 const fs = require("fs");
 const csv = require("csv-parser");
+
+// Add follwoig 3 lines to use .env vars
+const dotenv = require("dotenv");
+dotenv.config();
+const token = process.env.TOKEN;
+
 const { Octokit } = require("@octokit/rest");
 const octokit = new Octokit({
-  auth: "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",
+  auth: token,
 });
 
 // Function to fetch the community profile from the GitHub API
@@ -108,7 +114,7 @@ fs.createReadStream("merged_records.csv")
     }
 
     // Write the updated merged dataset to a new CSV file
-    const stream = fs.createWriteStream("community_records.csv");
+    const stream = fs.createWriteStream("community_standards_records.csv");
     stream.write(
       "Name,Package URL,Github,ecosystem,health_percentage,description,readme,code_of_conduct,contributing,license,pull_request_template,admin_accepts_content_report\n" // CSV header
     );

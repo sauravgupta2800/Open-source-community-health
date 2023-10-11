@@ -9,7 +9,7 @@ function filterRecords(records, ecosystem) {
   for (const record of records) {
     const { Name, "Package URL": packageUrl, Github } = record;
 
-    if (Github && Github.startsWith("https://github.com/") && count < 500) {
+    if (Github && Github.startsWith("https://github.com/")) {
       filteredRecords.push({
         Name,
         "Package URL": packageUrl,
