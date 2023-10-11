@@ -9,10 +9,11 @@ async function fetchData() {
   const totalRecords = 1000;
 
   let allRecords = [];
+  let uniqueRepositories = new Set();
 
-  const totalPages = Math.ceil(totalRecords / perPage);
-
-  for (let page = 1; page <= totalPages; page++) {
+  let page = 0;
+  while (allRecords.length < totalRecords) {
+    page = page + 1;
     const params = {
       sort: "dependent_repos_count",
       page,
@@ -23,14 +24,24 @@ async function fetchData() {
       const response = await axios.get(apiUrl, { params });
 
       const records = response.data;
-      allRecords = allRecords.concat(records);
+      for (const record of records) {
+        if (
+          record.repository_url &&
+          record.repository_url.startsWith("https://github.com/") &&
+          !uniqueRepositories.has(record.repository_url)
+        ) {
+          allRecords.push(record);
+          uniqueRepositories.add(record.repository_url);
+        }
+      }
+
       console.log(allRecords.length);
-      //   console.log(gems.map(({ name }) => name));
-      //   console.log(gems.length);
     } catch (error) {
       console.error("Error fetching gems:", error);
     }
   }
+
+  allRecords = allRecords.slice(0, totalRecords);
 
   console.log("Fetched records:", allRecords.length);
 

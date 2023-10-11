@@ -2,7 +2,7 @@ const fs = require("fs");
 const csv = require("csv-parser");
 const { Octokit } = require("@octokit/rest");
 const octokit = new Octokit({
-  auth: "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",
+  auth: "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",
 });
 
 // Function to fetch the contributor data from the GitHub API
