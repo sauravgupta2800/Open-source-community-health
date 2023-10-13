@@ -1,8 +1,13 @@
 const fs = require("fs");
 const csv = require("csv-parser");
 const { Octokit } = require("@octokit/rest");
+
+const dotenv = require("dotenv");
+dotenv.config();
+const token = process.env.TOKEN;
+
 const octokit = new Octokit({
-  auth: "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",
+  auth: token,
 });
 
 // Function to fetch the contributor data from the GitHub API
@@ -16,6 +21,13 @@ async function fetchContributorData(owner, repo) {
 
     console.log("res: ", res);
 
+    if (res.status === 202) {
+      // If the response is a 202 (Accepted) status, retry the API call after a delay
+      console.log("Received 202 status. Retrying in 5 seconds...");
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      return fetchContributorData(owner, repo);
+    }
+
     let contributors = [];
 
     if (res.data && Array.isArray(res.data)) {
@@ -23,20 +35,19 @@ async function fetchContributorData(owner, repo) {
     }
 
     const commits = contributors.map((contributor) => contributor.total);
-    const totalCommits = commits.reduce((total, count) => total + count, 0);
-    // Calculate contribution percentages and sort in descending order
-    const contributionPercentages = commits.map(
-      (count) => (count / totalCommits) * 100
+    const highestCommits = Math.max(...commits);
+    const normalizedCommits = commits.map((count) => count / highestCommits);
+    const totalCommits = normalizedCommits.reduce(
+      (total, count) => total + count,
+      0
     );
-
-    contributionPercentages.sort((a, b) => b - a);
 
     // 1. Mean
     let mean = 0;
-    if (commits.length) mean = totalCommits / commits.length;
+    if (commits.length) mean = totalCommits / normalizedCommits.length;
 
     // 2. Median
-    const sortedCommits = [...commits].sort((a, b) => a - b);
+    const sortedCommits = [...normalizedCommits].sort((a, b) => a - b);
     let median = 0;
     if (commits.length)
       median = sortedCommits[Math.floor(sortedCommits.length / 2)];
@@ -53,7 +64,7 @@ async function fetchContributorData(owner, repo) {
     let q1 = 0;
     let q2 = 0;
     let q3 = 0;
-    if (commits.length) {
+    if (sortedCommits.length) {
       q1 = sortedCommits[q1Index];
       q2 = sortedCommits[q2Index];
       q3 = sortedCommits[q3Index];
@@ -61,12 +72,12 @@ async function fetchContributorData(owner, repo) {
 
     // 5. Standard Deviation
     let standardDeviation = 0;
-    if (commits.length) {
-      const deviations = commits.map((count) => count - mean);
+    if (normalizedCommits.length) {
+      const deviations = normalizedCommits.map((count) => count - mean);
       const squaredDeviations = deviations.map((deviation) => deviation ** 2);
       const variance =
         squaredDeviations.reduce((total, deviation) => total + deviation, 0) /
-        commits.length;
+        normalizedCommits.length;
       standardDeviation = Math.sqrt(variance);
     }
 
@@ -95,7 +106,10 @@ async function fetchContributorData(owner, repo) {
   }
 }
 
-// fetchContributorData("yargs", "yargs");
+async function test() {
+  var response = await fetchContributorData("chalk", "chalk");
+  console.log(response);
+}
 
 // Read merged_records.csv
 const mergedRecords = [];
@@ -146,7 +160,7 @@ fs.createReadStream("merged_records.csv")
     }
 
     // Write the updated merged dataset to a new CSV file
-    const stream = fs.createWriteStream("contributor_records.csv");
+    const stream = fs.createWriteStream("community_participation_records.csv");
     stream.write(
       "Name,Package URL,Github,ecosystem,Mean,Median,Range,q1,q2,q3,Std\n" // CSV header
     );
@@ -172,5 +186,7 @@ fs.createReadStream("merged_records.csv")
     }
 
     stream.end();
-    console.log("Updated merged records written to contributor_records.csv");
+    console.log(
+      "Updated merged records written to community_participation_records.csv"
+    );
   });
