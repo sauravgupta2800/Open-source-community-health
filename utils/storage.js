@@ -51,6 +51,10 @@ class KeyValueStorage {
     delete this.data[key];
     this.save();
   }
+
+  exits(key) {
+    return !!this.data[key];
+  }
 }
 
 const storage = new KeyValueStorage();
@@ -64,3 +68,5 @@ console.log("Age:", storage.get("age"));
 // storage.remove("age");
 
 console.log("Age:", storage.get("age"));
+
+module.exports = KeyValueStorage;
