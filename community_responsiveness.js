@@ -46,7 +46,9 @@ const COMMENT_AUTHOR_ASSOCIATION = [
   "OWNER",
 ];
 
-const INSIDER = ["COLLABORATOR", "CONTRIBUTOR", "MEMBER", "OWNER"];
+// "CONTRIBUTOR" has been removed from the INSIDER LIST
+
+const INSIDER = ["COLLABORATOR", "MEMBER", "OWNER"];
 const perPageIssues = 100; // You can set this to the maximum of 100
 const perPageComments = 100; // You can set this to the maximum of 100
 const issuePageLimit = 2;
