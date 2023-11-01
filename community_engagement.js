@@ -79,7 +79,6 @@ async function fetchPRs(owner, repo, page = 1, records = []) {
     });
 
     if (res.status === 200) {
-      console.log("Size: ", records.length, res.data.length);
       if (res.data.length === 0) {
         // No more pull requests to fetch
         return records;
@@ -128,7 +127,7 @@ async function fetchPRs(owner, repo, page = 1, records = []) {
 
 // Read merged_records.csv
 const mergedRecords = [];
-fs.createReadStream("merged_records_just_for_testing.csv")
+fs.createReadStream("merged_records.csv")
   .pipe(csv())
   .on("data", (data) => mergedRecords.push(data))
   .on("end", async () => {

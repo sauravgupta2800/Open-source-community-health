@@ -1,4 +1,4 @@
-Name,Package URL,Github,ecosystem,id,number,userlogin,usertype,author_association,created_at,state,isGoodFirstLabelExists
+Name,Package URL,Github,ecosystem,id,number,userlogin,usertype,author_association,state,isGoodFirstLabelExists
 chalk,https://www.npmjs.com/package/chalk,https://github.com/chalk/chalk,npm,1435740990,605,alguerocode,User,NONE,closed,false
 chalk,https://www.npmjs.com/package/chalk,https://github.com/chalk/chalk,npm,1412070777,603,silverwind,User,CONTRIBUTOR,closed,false
 chalk,https://www.npmjs.com/package/chalk,https://github.com/chalk/chalk,npm,1391824008,600,lukekarrys,User,NONE,open,false
