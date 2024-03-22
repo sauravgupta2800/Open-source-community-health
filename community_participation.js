@@ -86,8 +86,18 @@ async function fetchContributorData(owner, repo) {
     console.log("Range:", range);
     console.log("Quartiles:", q1, q2, q3);
     console.log("Standard Deviation:", standardDeviation);
+    console.log("totalContributors:", contributors.length);
 
-    return { mean, median, range, q1, q2, q3, standardDeviation };
+    return {
+      mean,
+      median,
+      range,
+      q1,
+      q2,
+      q3,
+      standardDeviation,
+      totalContributors: contributors.length,
+    };
   } catch (error) {
     console.error(
       `Error fetching contrubutor data for ${owner}/${repo}:`,
@@ -102,6 +112,7 @@ async function fetchContributorData(owner, repo) {
       q2: 0,
       q3: 0,
       standardDeviation: 0,
+      totalContributors: 0,
     };
   }
 }
@@ -135,8 +146,16 @@ fs.createReadStream("merged_records.csv")
         const url = new URL(Github);
         const [owner, repo] = url.pathname.slice(1).split("/");
         // Fetch community profile from GitHub API
-        const { mean, median, range, q1, q2, q3, standardDeviation } =
-          await fetchContributorData(owner, repo);
+        const {
+          mean,
+          median,
+          range,
+          q1,
+          q2,
+          q3,
+          standardDeviation,
+          totalContributors,
+        } = await fetchContributorData(owner, repo);
 
         // Add the new columns to the record
         const updatedRecord = {
@@ -151,6 +170,7 @@ fs.createReadStream("merged_records.csv")
           q2,
           q3,
           standardDeviation,
+          totalContributors,
         };
 
         updatedMergedRecords.push(updatedRecord);
@@ -162,7 +182,7 @@ fs.createReadStream("merged_records.csv")
     // Write the updated merged dataset to a new CSV file
     const stream = fs.createWriteStream("community_participation_records.csv");
     stream.write(
-      "Name,Package URL,Github,ecosystem,Mean,Median,Range,q1,q2,q3,Std\n" // CSV header
+      "Name,Package URL,Github,ecosystem,Mean,Median,Range,q1,q2,q3,Std,totalContributors\n" // CSV header
     );
 
     for (const record of updatedMergedRecords) {
@@ -178,10 +198,11 @@ fs.createReadStream("merged_records.csv")
         q2,
         q3,
         standardDeviation,
+        totalContributors,
       } = record;
 
       stream.write(
-        `${Name},${packageUrl},${Github},${ecosystem},${mean},${median},${range},${q1},${q2},${q3},${standardDeviation}\n`
+        `${Name},${packageUrl},${Github},${ecosystem},${mean},${median},${range},${q1},${q2},${q3},${standardDeviation},${totalContributors}\n`
       );
     }
 
